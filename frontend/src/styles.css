@@ -1,0 +1,38 @@
+/* Plain CSS on purpose: the tests locate by role and label, never by class. */
+:root {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: #1f2933;
+  background: #f7f7f5;
+}
+body { margin: 0; }
+header.site {
+  display: flex; align-items: center; gap: 1.5rem; padding: 0.75rem 1.5rem;
+  background: #2f3e46; color: #fff;
+}
+header.site .brand { font-weight: 700; font-size: 1.2rem; margin-right: auto; color: #fff; text-decoration: none; }
+header.site nav a { color: #cfd8dc; text-decoration: none; margin-right: 1rem; }
+header.site nav a.active { color: #fff; text-decoration: underline; }
+header.site button { background: transparent; color: #fff; border: 1px solid #fff; }
+main { max-width: 960px; margin: 0 auto; padding: 1.5rem; }
+h1 { margin-top: 0; }
+form.card, section.card {
+  background: #fff; border: 1px solid #dfe3e6; border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1.5rem;
+}
+form.card .field { display: flex; flex-direction: column; gap: 0.25rem; margin-bottom: 0.75rem; }
+form.card .field.inline { flex-direction: row; align-items: center; gap: 0.5rem; }
+label { font-weight: 600; }
+input[type="text"], input[type="email"], input[type="password"], input[type="search"], select {
+  padding: 0.45rem 0.6rem; border: 1px solid #b0bec5; border-radius: 4px; font-size: 1rem; max-width: 24rem;
+}
+button { padding: 0.45rem 0.9rem; border-radius: 4px; border: 1px solid #2f3e46; background: #2f3e46; color: #fff; font-size: 0.95rem; cursor: pointer; }
+button.secondary { background: #fff; color: #2f3e46; }
+button.danger { background: #b71c1c; border-color: #b71c1c; }
+.error { color: #b71c1c; margin: 0; }
+.notice { color: #1b5e20; }
+table { width: 100%; border-collapse: collapse; background: #fff; }
+th, td { text-align: left; padding: 0.5rem 0.6rem; border-bottom: 1px solid #e0e0e0; vertical-align: middle; }
+img.cover { width: 32px; height: 44px; object-fit: cover; border-radius: 2px; }
+.backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.45); display: flex; align-items: center; justify-content: center; }
+.modal { background: #fff; padding: 1.25rem 1.5rem; border-radius: 8px; min-width: 20rem; }
+.modal .actions { display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1rem; }
+p.muted { color: #607d8b; }

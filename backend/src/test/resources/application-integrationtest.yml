@@ -1,0 +1,21 @@
+# The backend's OWN integration tests ( *IT, failsafe ): a full Spring context
+# on a random port against the dockerised Postgres ( make docker-up ), a unique
+# schema per context ( UniqueSchemaPerContextInitializer ), seed.sql loaded on
+# start, email queued but never sent.
+app:
+  mail:
+    enabled: false
+  loans:
+    delay-ms: 50
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5435/bookshelf_it
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:seed.sql

@@ -1,0 +1,87 @@
+# Bookshelf backend - one profile per purpose:
+#   dev             keeps data across restarts ( bookshelf_dev )      make dev
+#   e2e             fresh create-drop schema + seed.sql on EVERY start ( bookshelf_e2e )
+#                   - the profile the Playwright suites boot, so a fresh backend
+#                   IS a fresh database                                  make test
+#   integrationtest the backend's own *IT tests ( src/test/resources )
+#
+# Inside docker compose the DB_HOST / DB_PORT / MAIL_HOST / MAIL_PORT variables
+# point at the sibling containers; on the host they default to the published ports.
+
+server:
+  port: 8086
+
+app:
+  # the JWT signing secret is FIXED so a token saved by one backend ( storage
+  # state ) is still valid against the next fresh one
+  jwt:
+    secret: bookshelf-course-secret-that-is-long-enough-for-hmac-sha256-signing
+    ttl-ms: 3600000
+  # every emailed link is built from this
+  frontend:
+    url: http://localhost:5173
+  # the loans page answers slowly on purpose - auto-waiting needs something to wait FOR
+  loans:
+    delay-ms: 1500
+  mail:
+    enabled: true
+
+spring:
+  application:
+    name: bookshelf
+  profiles:
+    default: dev
+  mail:
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:1027}
+  datasource:
+    username: bookshelf
+    password: bookshelf
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    open-in-view: false
+    show-sql: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 3MB
+
+logging:
+  level:
+    org.hibernate.SQL: WARN
+    org.springframework.security: INFO
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5435}/bookshelf_dev
+  jpa:
+    hibernate:
+      ddl-auto: update
+    defer-datasource-initialization: true
+  sql:
+    init:
+      # seed once into an empty dev database; the inserts are idempotent
+      mode: always
+      data-locations: classpath:seed.sql
+      continue-on-error: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: e2e
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5435}/bookshelf_e2e
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:seed.sql

@@ -1,0 +1,7 @@
+node_modules/
+dist/
+backend/target/
+e2e/reports/
+e2e/test-results/
+e2e/.auth/
+.DS_Store

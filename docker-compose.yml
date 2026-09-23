@@ -1,0 +1,53 @@
+# The three containers behind Bookshelf. Ports are chosen not to clash with a
+# locally installed Postgres or other course apps.
+#
+#   make docker-up   starts postgres + mailhog and BUILDS the backend image
+#   the Playwright fixture starts / stops the backend container per suite
+#   make dev         starts the backend on the dev profile for manual exploration
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: bookshelf-postgres
+    environment:
+      POSTGRES_USER: bookshelf
+      POSTGRES_PASSWORD: bookshelf
+      POSTGRES_DB: bookshelf_dev
+    ports:
+      - "5435:5432"
+    volumes:
+      # creates the bookshelf_e2e and bookshelf_it databases on first start
+      - ./docker/postgres-init:/docker-entrypoint-initdb.d
+      - bookshelf-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bookshelf -d bookshelf_dev"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    container_name: bookshelf-mailhog
+    ports:
+      - "1027:1025" # SMTP - the backend sends here
+      - "8027:8025" # HTTP - the inbox UI and the API the tests poll ( http://localhost:8027 )
+
+  backend:
+    build: ./backend
+    image: bookshelf-backend
+    container_name: bookshelf-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mailhog:
+        condition: service_started
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-e2e}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      MAIL_HOST: mailhog
+      MAIL_PORT: 1025
+    ports:
+      - "8086:8086"
+
+volumes:
+  bookshelf-pgdata:
