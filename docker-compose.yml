@@ -4,6 +4,10 @@
 #   make docker-up   starts postgres + mailhog and BUILDS the backend image
 #   the Playwright fixture starts / stops the backend container per suite
 #   make dev         starts the backend on the dev profile for manual exploration
+# the compose PROJECT name - what Docker Desktop groups the containers under; fixed
+# here so it never depends on the folder the repository was cloned into
+name: bookshelf
+
 services:
   postgres:
     image: postgres:17-alpine
