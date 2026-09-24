@@ -11,7 +11,7 @@ name: bookshelf
 services:
   postgres:
     image: postgres:17-alpine
-    container_name: bookshelf-postgres
+    container_name: playwright-basics-examples-postgres
     environment:
       POSTGRES_USER: bookshelf
       POSTGRES_PASSWORD: bookshelf
@@ -21,7 +21,7 @@ services:
     volumes:
       # creates the bookshelf_e2e and bookshelf_it databases on first start
       - ./docker/postgres-init:/docker-entrypoint-initdb.d
-      - bookshelf-pgdata:/var/lib/postgresql/data
+      - playwright-basics-examples-pgdata:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U bookshelf -d bookshelf_dev"]
       interval: 2s
@@ -30,15 +30,15 @@ services:
 
   mailhog:
     image: mailhog/mailhog:v1.0.1
-    container_name: bookshelf-mailhog
+    container_name: playwright-basics-examples-mailhog
     ports:
       - "1027:1025" # SMTP - the backend sends here
       - "8027:8025" # HTTP - the inbox UI and the API the tests poll ( http://localhost:8027 )
 
   backend:
     build: ./backend
-    image: bookshelf-backend
-    container_name: bookshelf-backend
+    image: playwright-basics-examples-backend
+    container_name: playwright-basics-examples-backend
     depends_on:
       postgres:
         condition: service_healthy
@@ -54,4 +54,4 @@ services:
       - "8086:8086"
 
 volumes:
-  bookshelf-pgdata:
+  playwright-basics-examples-pgdata:
